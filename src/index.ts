@@ -8,6 +8,7 @@ import { readFile } from './fs';
 import { HomepageRenderer } from './html-renderer';
 import { LocalePackager } from './locale-packager';
 import { createPackage } from './metadata/metadata';
+import { Notifier } from './notifier';
 import { findPackageJson, getProjectPath, mustLoadPackageJson } from './npm';
 import { addFilesToCompilation, contentsToAsset, fileToAsset } from './webpack-tools';
 
@@ -41,6 +42,8 @@ export class MixerPlugin {
     if (!projectPath) {
       throw new Error('Could not find your project path, are you missing a package.json?');
     }
+
+    new Notifier().apply(compiler);
 
     compiler.plugin('emit', async (compilation: any, callback: any) => {
       try {
