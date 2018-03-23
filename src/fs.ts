@@ -26,3 +26,12 @@ export async function readFile(file: string): Promise<string> {
     fs.readFile(file, 'utf8', callback);
   });
 }
+
+/**
+ * Promisified fs.exists
+ */
+export async function exists(file: string): Promise<boolean> {
+  return new Promise<boolean>(resolve => {
+    fs.exists(file, resolve);
+  });
+}
