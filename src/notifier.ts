@@ -57,6 +57,6 @@ export class Notifier {
   private printStatus(state: CompilationState) {
     // \n before just in case whoever came before us didn't clean up
     // after themselves, or is writing an async stream.
-    process.stderr.write(`\n${notificationPrefix}:${JSON.stringify({ state })}\n`);
+    process.stderr.write(`\n${notificationPrefix}${JSON.stringify({ state })}\n`);
   }
 }

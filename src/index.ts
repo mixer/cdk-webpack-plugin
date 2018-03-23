@@ -38,19 +38,21 @@ export class MixerPlugin {
   constructor(private readonly options: IPluginOptions) {}
 
   public apply(compiler: any) {
-    const projectPath = getProjectPath(compiler.context);
-    if (!projectPath) {
-      throw new Error('Could not find your project path, are you missing a package.json?');
-    }
-
     new Notifier().apply(compiler);
 
     compiler.plugin('emit', async (compilation: any, callback: any) => {
       try {
-        const jsonPath = findPackageJson(projectPath)!;
+        const projectPath = await getProjectPath(compiler.context);
+        if (!projectPath) {
+          throw new Error('Could not find your project path, are you missing a package.json?');
+        }
+
+        const jsonPath = (await findPackageJson(projectPath))!;
         addFilesToCompilation(compilation, jsonPath);
-        const packageJson = mustLoadPackageJson(projectPath);
+
+        const packageJson = await mustLoadPackageJson(projectPath);
         this.package = await createPackage(packageJson, projectPath);
+
         await this.addProductionFiles(compiler, compilation);
       } catch (e) {
         callback(e);
