@@ -1,3 +1,5 @@
+import { IPackageConfig } from '@mcph/miix-std/dist/package';
+
 /**
  * Prefix shown before notification lines before the JSON-encoded INotification.
  */
@@ -19,11 +21,30 @@ export const enum CompilationState {
 }
 
 /**
- * Data emitted on the console.
+ * Type of emitted notification.
  */
-export interface INotification {
-  state: CompilationState;
+export const enum NotificationType {
+  Status,
+  Metadata,
 }
+
+/**
+ * Fired when the compilation state changes.
+ */
+export interface IStateNotification {
+  state: CompilationState;
+  kind: NotificationType.Status;
+}
+
+/**
+ * Fired when the project metadata changes.
+ */
+export interface IMetadataNotification {
+  metadata: IPackageConfig;
+  kind: NotificationType.Metadata;
+}
+
+export type Notification = IStateNotification | IMetadataNotification;
 
 /**
  * The Notifier is loaded in development mode. It'll print a friendly blob
@@ -34,11 +55,12 @@ export interface INotification {
  * inspired by {@link https://git.io/vxB3O}.
  */
 export class Notifier {
-  public apply(compiler: any) {
-    if (!process.env[notificationEnv]) {
-      return;
-    }
+  constructor(public readonly isEnabled: boolean = !!process.env[notificationEnv]) {}
 
+  /**
+   * Attaches the Notifier to compiler states.
+   */
+  public apply(compiler: any) {
     this.printStatus(CompilationState.Started);
 
     compiler.plugin('invalid', () => {
@@ -54,9 +76,24 @@ export class Notifier {
     });
   }
 
+  /**
+   * Should be called when project metadata changes, or is re-inspected.
+   */
+  public updateMetadata(metadata: IPackageConfig) {
+    this.printNotification({ kind: NotificationType.Metadata, metadata });
+  }
+
   private printStatus(state: CompilationState) {
+    this.printNotification({ kind: NotificationType.Status, state });
+  }
+
+  private printNotification(notification: Notification) {
+    if (!this.isEnabled) {
+      return;
+    }
+
     // \n before just in case whoever came before us didn't clean up
     // after themselves, or is writing an async stream.
-    process.stderr.write(`\n${notificationPrefix}${JSON.stringify({ state })}\n`);
+    process.stderr.write(`\n${notificationPrefix}${JSON.stringify(notification)}\n`);
   }
 }
