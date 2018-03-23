@@ -34,11 +34,12 @@ export interface IPluginOptions {
  */
 export class MixerPlugin {
   private package!: IPackageConfig;
+  private notifier = new Notifier();
 
   constructor(private readonly options: IPluginOptions) {}
 
   public apply(compiler: any) {
-    new Notifier().apply(compiler);
+    this.notifier.apply(compiler);
 
     compiler.plugin('emit', async (compilation: any, callback: any) => {
       try {
@@ -52,6 +53,7 @@ export class MixerPlugin {
 
         const packageJson = await mustLoadPackageJson(projectPath);
         this.package = await createPackage(packageJson, projectPath);
+        this.notifier.updateMetadata(this.package);
 
         await this.addProductionFiles(compiler, compilation);
       } catch (e) {
