@@ -1,0 +1,27 @@
+{
+  "name": "@mcph/miix-webpack-plugin",
+  "version": "0.1.0",
+  "description": "Webpack plugin for Mixer interactive projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mixer/miix-webpack-plugin.git"
+  },
+  "keywords": [
+    "miix",
+    "mixer",
+    "interactive",
+    "controls",
+    "webpack",
+    "plugin"
+  ],
+  "author": "Connor Peet <connor@peet.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mixer/miix-webpack-plugin/issues"
+  },
+  "homepage": "https://github.com/mixer/miix-webpack-plugin#readme"
+}
