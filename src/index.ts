@@ -80,12 +80,11 @@ export class MixerPlugin {
 
   private async addFiles(compilation: any, files: { [assetName: string]: string }): Promise<void> {
     return Promise.all(
-      Object.keys(files).map(async assetName =>
-        fileToAsset(files[assetName]).then(asset => {
-          compilation.assets[assetName] = asset;
-          compilation.fileDependencies.push(files[assetName]);
-        }),
-      ),
+      Object.keys(files).map(async assetName => {
+        const asset = await fileToAsset(files[assetName]);
+        compilation.assets[assetName] = asset;
+        addFilesToCompilation(compilation, files[assetName]);
+      }),
     ).then(() => undefined);
   }
 }

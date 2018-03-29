@@ -95,13 +95,9 @@ export class HomepageRenderer extends HTMLInjector {
   }
 
   protected async injectHead(): Promise<string[]> {
-    const output: string[] = [];
-
-    output.push(
+    return [
       `<script>window.mixerPackageConfig=${JSON.stringify(this.packaged)};` +
         `window.mixerLocales=${JSON.stringify(this.locales)}</script>`,
-    );
-
-    return output;
+    ];
   }
 }
