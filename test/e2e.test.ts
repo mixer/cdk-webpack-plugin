@@ -122,6 +122,7 @@ describe('e2e', () => {
         {
           kind: NotificationType.BundleCreated,
           location: results.tarLocation,
+          readme: null,
         },
       ]);
     });
@@ -131,6 +132,49 @@ describe('e2e', () => {
         'bundle.js',
         'index.html',
         'package.json',
+      ]);
+    });
+  });
+
+  describe('build-with-readme', () => {
+    let results: IPackResults;
+    before(async () => {
+      results = await packDirectory('build-with-readme');
+    });
+
+    after(() => {
+      clearDirectory('build-with-readme');
+      unlinkSync(results.tarLocation);
+    });
+
+    it('emits notifications correctly', async () => {
+      expect(results.notifications).to.deep.equal([
+        {
+          kind: NotificationType.Status,
+          state: CompilationState.Started,
+        },
+        {
+          kind: NotificationType.Metadata,
+          metadata: { name: 'hello-world', version: '0.1.0', controls: {}, scenes: {} },
+        },
+        {
+          kind: NotificationType.Status,
+          state: CompilationState.Success,
+        },
+        {
+          kind: NotificationType.BundleCreated,
+          location: results.tarLocation,
+          readme: '<h1 id="build-with-readme">build-with-readme</h1>\n',
+        },
+      ]);
+    });
+
+    it('builds bundle outputs', async () => {
+      expect(await listTarballFiles(results.tarLocation)).to.deep.equal([
+        'bundle.js',
+        'index.html',
+        'package.json',
+        'readme.md',
       ]);
     });
   });
