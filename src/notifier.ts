@@ -53,6 +53,7 @@ export interface IMetadataNotification {
 export interface IBundleCreated {
   kind: NotificationType.BundleCreated;
   location: string;
+  readme: string | null;
 }
 
 /**

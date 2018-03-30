@@ -1,11 +1,12 @@
+import * as marked from 'marked';
 import { tmpdir } from 'os';
 import * as path from 'path';
 import * as tar from 'tar';
 
 import { unlinkSync } from 'fs';
 import { PackageIntegrityError } from './errors';
-import { exists, readDir } from './fs';
-import { NotificationType, Notifier } from './notifier';
+import { exists, readDir, readFile } from './fs';
+import { Notification, NotificationType, Notifier } from './notifier';
 import { copy, findPackageJson, findReadme, getProjectPath, mustLoadPackageJson } from './npm';
 
 /**
@@ -45,11 +46,7 @@ export class BundleEmitter {
         }
 
         try {
-          await this.startBundling(compiler);
-          this.notifier.printNotification({
-            kind: NotificationType.BundleCreated,
-            location: this.fileTarget,
-          });
+          this.notifier.printNotification(await this.startBundling(compiler));
         } catch (err) {
           try {
             unlinkSync(this.fileTarget);
@@ -65,13 +62,19 @@ export class BundleEmitter {
     );
   }
 
-  private async startBundling(compiler: any) {
+  private async startBundling(compiler: any): Promise<Notification> {
     const projectPath = (await getProjectPath(compiler.context))!;
     const packageJson = await mustLoadPackageJson(projectPath);
 
     const output: string = compiler.outputPath;
     await this.verifyIntegrity(output);
     await this.createTarball(projectPath, output);
+
+    return {
+      kind: NotificationType.BundleCreated,
+      location: this.fileTarget,
+      readme: await this.renderReadme(projectPath),
+    };
   }
 
   /**
@@ -85,6 +88,20 @@ export class BundleEmitter {
         `An index.html is missing in your project output (${home} should exist)`,
       );
     }
+  }
+
+  /**
+   * Tries to render the readme in the project, returning the HTML
+   * if it's able to do so.
+   */
+  private async renderReadme(projectPath: string): Promise<string | null> {
+    const readme = await findReadme(projectPath);
+    if (!readme) {
+      return null;
+    }
+
+    const contents = await readFile(readme);
+    return marked(contents);
   }
 
   /**
