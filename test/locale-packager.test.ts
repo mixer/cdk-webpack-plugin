@@ -4,9 +4,9 @@ import { LocalePackager } from '../src/locale-packager';
 
 describe('Locale packager', () => {
   function checkOutput(cmp: any, results: { [key: string]: object }) {
-    expect(cmp.fileDependencies).to.deep.equal([
-      join(__dirname, 'fixtures', 'locales', 'es.json'),
+    expect(cmp.fileDependencies.sort()).to.deep.equal([
       join(__dirname, 'fixtures', 'locales', 'en.json'),
+      join(__dirname, 'fixtures', 'locales', 'es.json'),
     ]);
 
     expect(results).to.deep.equal({

@@ -14,9 +14,14 @@ export function addFilesToCompilation(compilation: any, files: string[] | string
     if (!path.isAbsolute(file)) {
       throw new Error(`Expected path to be absolute: ${file}`);
     }
-
-    if (!compilation.fileDependencies.includes(file)) {
-      compilation.fileDependencies.push(file);
+    if (compilation.fileDependencies instanceof Array) {
+      // webpack < 4
+      if (!compilation.fileDependencies.includes(file)) {
+        compilation.fileDependencies.push(file);
+      }
+    } else {
+      // webpack 4, SortedSet
+      compilation.fileDependencies.add(file);
     }
   });
 }

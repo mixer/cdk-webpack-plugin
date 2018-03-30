@@ -18,7 +18,7 @@ export class LocalePackager {
    * compile loads locales matching the glob pattern to a map of locales
    * (from the file basenames) to their contents.
    */
-  public async compile(pattern: string): Promise<{ [locale: string]: object }> {
+  public async compile(pattern?: string): Promise<{ [locale: string]: object }> {
     if (!pattern) {
       return {};
     }
