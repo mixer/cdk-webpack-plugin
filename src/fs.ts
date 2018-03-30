@@ -35,3 +35,12 @@ export async function exists(file: string): Promise<boolean> {
     fs.exists(file, resolve);
   });
 }
+
+/**
+ * Promisified fs.readDir
+ */
+export async function readDir(dir: string): Promise<string[]> {
+  return promiseCallback<string[]>(callback => {
+    fs.readdir(dir, callback);
+  });
+}

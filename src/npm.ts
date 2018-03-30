@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { exists, readFile } from './fs';
+import { exists, readDir, readFile } from './fs';
 
 /**
  * Finds the nearest package.json relative to the given directory, returning
@@ -44,4 +44,35 @@ export async function mustLoadPackageJson(dir: string): Promise<any> {
 export async function getProjectPath(dir: string): Promise<string | undefined> {
   const json = await findPackageJson(dir);
   return json ? path.dirname(json) : undefined;
+}
+
+/**
+ * Finds the readme for the project in the given directory. Uses a similar
+ * process to npm.
+ */
+export async function findReadme(dir: string): Promise<string | undefined> {
+  const fname = (await readDir(dir)).find(f => /^readme\.?/i.test(f));
+  if (fname) {
+    return path.join(dir, fname);
+  }
+
+  try {
+    const packageJson = await mustLoadPackageJson(dir);
+    return packageJson && path.normalize(path.resolve(dir, packageJson.readmeFile));
+  } catch (e) {
+    return undefined;
+  }
+}
+
+/**
+ * Copies a file from one place to another.
+ */
+export async function copy(source: string, destination: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    fs
+      .createReadStream(source)
+      .pipe(fs.createWriteStream(destination))
+      .on('error', reject)
+      .on('close', resolve);
+  });
 }

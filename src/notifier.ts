@@ -26,6 +26,8 @@ export const enum CompilationState {
 export const enum NotificationType {
   Status,
   Metadata,
+  BundleCreated,
+  BundleFailed,
 }
 
 /**
@@ -44,7 +46,28 @@ export interface IMetadataNotification {
   kind: NotificationType.Metadata;
 }
 
-export type Notification = IStateNotification | IMetadataNotification;
+/**
+ * Emits that a bundle has been created. Contains the location of the
+ * tarball on the filesystem.
+ */
+export interface IBundleCreated {
+  kind: NotificationType.BundleCreated;
+  location: string;
+}
+
+/**
+ * Emits that bundle creation has failed.
+ */
+export interface IBundleFailed {
+  kind: NotificationType.BundleFailed;
+  error: string;
+}
+
+export type Notification =
+  | IStateNotification
+  | IMetadataNotification
+  | IBundleCreated
+  | IBundleFailed;
 
 /**
  * The Notifier is loaded in development mode. It'll print a friendly blob
@@ -63,17 +86,30 @@ export class Notifier {
   public apply(compiler: any) {
     this.printStatus(CompilationState.Started);
 
-    compiler.plugin('invalid', () => {
+    compiler.hooks.invalid.tap('MiixWebpackPlugin#notifier', () => {
       this.printStatus(CompilationState.Started);
     });
 
-    compiler.plugin('done', (stats: { hasErrors(): boolean }) => {
+    compiler.hooks.done.tap('MiixWebpackPlugin#notifier', (stats: { hasErrors(): boolean }) => {
       if (stats.hasErrors()) {
         this.printStatus(CompilationState.Error);
       } else {
         this.printStatus(CompilationState.Success);
       }
     });
+  }
+
+  /**
+   * Writes a notification to the console out.
+   */
+  public printNotification(notification: Notification) {
+    if (!this.isEnabled) {
+      return;
+    }
+
+    // \n before just in case whoever came before us didn't clean up
+    // after themselves, or is writing an async stream.
+    process.stderr.write(`\n${notificationPrefix}${JSON.stringify(notification)}\n`);
   }
 
   /**
@@ -86,14 +122,18 @@ export class Notifier {
   private printStatus(state: CompilationState) {
     this.printNotification({ kind: NotificationType.Status, state });
   }
+}
 
-  private printNotification(notification: Notification) {
-    if (!this.isEnabled) {
-      return;
-    }
+/**
+ * Reads the notification from the console output line. Returns null if
+ * the line does not contain a notification.
+ */
+export function readNotification(line: string): Notification | null {
+  line = line.trim();
 
-    // \n before just in case whoever came before us didn't clean up
-    // after themselves, or is writing an async stream.
-    process.stderr.write(`\n${notificationPrefix}${JSON.stringify(notification)}\n`);
+  if (!line.startsWith(notificationPrefix)) {
+    return null;
   }
+
+  return JSON.parse(line.slice(notificationPrefix.length));
 }
