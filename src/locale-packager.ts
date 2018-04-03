@@ -49,6 +49,18 @@ export class LocalePackager {
       }),
     );
 
+    this.addToCompilation(output);
+
     return output;
+  }
+
+  /**
+   * Adds the compile()'d locale data to the webpack compilation,
+   * in the locales folder.
+   */
+  public addToCompilation(data: { [locale: string]: object }) {
+    Object.keys(data).forEach(key => {
+      this.compilation.assets[`locales/${key}.json`] = contentsToAsset(JSON.stringify(data[key]));
+    });
   }
 }

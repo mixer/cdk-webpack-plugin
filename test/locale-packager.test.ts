@@ -20,19 +20,19 @@ describe('Locale packager', () => {
   }
 
   it('loads locales correctly with an absolute glob', async () => {
-    const cmp = { fileDependencies: [], compiler: { context: __dirname } };
+    const cmp = { fileDependencies: [], assets: {}, compiler: { context: __dirname } };
     const results = await new LocalePackager(cmp).compile(`${__dirname}/fixtures/locales/*.json`);
     checkOutput(cmp, results);
   });
 
   it('loads locales correctly with a relative glob', async () => {
-    const cmp = { fileDependencies: [], compiler: { context: __dirname } };
+    const cmp = { fileDependencies: [], assets: {}, compiler: { context: __dirname } };
     const results = await new LocalePackager(cmp).compile(`fixtures/locales/*.json`);
     checkOutput(cmp, results);
   });
 
   it('loads locales correctly with a weird glob', async () => {
-    const cmp = { fileDependencies: [], compiler: { context: `${__dirname}/wut` } };
+    const cmp = { fileDependencies: [], assets: {}, compiler: { context: `${__dirname}/wut` } };
     const results = await new LocalePackager(cmp).compile(`../fixtures/locales/*.json`);
     checkOutput(cmp, results);
   });
