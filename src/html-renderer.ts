@@ -25,17 +25,27 @@ export abstract class HTMLInjector {
       throw new MixerPluginError('Your homepage is missing a <head> section!');
     }
 
+    this.prepend(head, ...(await this.injectHead(compiler)));
+
     const body = <parse5.AST.HtmlParser2.ParentNode>this.findNode(parsed, [
       'html',
       'body',
     ]);
-
     if (!body) {
       throw new MixerPluginError('Your homepage is missing a <body> section!');
     }
 
-    this.prepend(head, ...(await this.injectHead(compiler)));
-    this.append(body, ...(await this.injectBody(compiler)));
+    // If there is a script tag already inside the body, let's not double up
+    // just in case something breaks.
+    const script = <parse5.AST.HtmlParser2.ParentNode>this.findNode(parsed, [
+      'html',
+      'body',
+      'script',
+    ]);
+    if (!script) {
+      this.append(body, ...(await this.injectBody(compiler)));
+    }
+
     return parse5.serialize(parsed);
   }
 
@@ -47,7 +57,7 @@ export abstract class HTMLInjector {
   }
 
   /**
-   * injectBody returns a list of HTML fragments to inser into the page <body>.
+   * injectBody returns a list of HTML fragments to insert into the page <body>.
    */
   protected async injectBody(_compiler: any): Promise<string[]> {
     return [];
@@ -59,7 +69,7 @@ export abstract class HTMLInjector {
     try {
       return <parse5.AST.HtmlParser2.Document>parse5.parse(og);
     } catch (e) {
-      throw new Error(`Could not parse HTML from your homeage: ${e.stack}`);
+      throw new Error(`Could not parse HTML from your homepage: ${e.stack}`);
     }
   }
 
@@ -93,6 +103,29 @@ export abstract class HTMLInjector {
   }
 
   private findNode(
+    parent: parse5.AST.HtmlParser2.Node,
+    nodePath: string[],
+  ): parse5.AST.HtmlParser2.Node | undefined {
+    for (let i = 0; i < nodePath.length; i++) {
+      if (!(<any>parent).childNodes) {
+        return undefined;
+      }
+
+      const child = (<parse5.AST.HtmlParser2.ParentNode>parent).childNodes.find(
+        n => (<parse5.AST.HtmlParser2.Element>n).tagName === nodePath[i],
+      );
+
+      if (!child) {
+        return undefined;
+      }
+
+      parent = child;
+    }
+
+    return parent;
+  }
+
+  private findElement(
     parent: parse5.AST.HtmlParser2.Node,
     nodePath: string[],
   ): parse5.AST.HtmlParser2.Node | undefined {
