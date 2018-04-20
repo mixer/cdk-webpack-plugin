@@ -25,6 +25,11 @@ export interface IPluginOptions {
    * glob for the locale json files.
    */
   locales?: string;
+
+  /**
+   * Unique identifier for cache busting.
+   */
+  unique?: string
 }
 
 /**
@@ -84,6 +89,7 @@ export class MixerPlugin {
         path.resolve(compiler.context, this.options.homepage),
         this.package,
         Object.keys(locales),
+        this.options.unique
       )
         .render(compiler)
         .then(result => {
