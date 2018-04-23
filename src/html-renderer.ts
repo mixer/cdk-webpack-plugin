@@ -124,29 +124,6 @@ export abstract class HTMLInjector {
 
     return parent;
   }
-
-  private findElement(
-    parent: parse5.AST.HtmlParser2.Node,
-    nodePath: string[],
-  ): parse5.AST.HtmlParser2.Node | undefined {
-    for (let i = 0; i < nodePath.length; i++) {
-      if (!(<any>parent).childNodes) {
-        return undefined;
-      }
-
-      const child = (<parse5.AST.HtmlParser2.ParentNode>parent).childNodes.find(
-        n => (<parse5.AST.HtmlParser2.Element>n).tagName === nodePath[i],
-      );
-
-      if (!child) {
-        return undefined;
-      }
-
-      parent = child;
-    }
-
-    return parent;
-  }
 }
 
 /**
