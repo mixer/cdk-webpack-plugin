@@ -17,12 +17,35 @@ export abstract class HTMLInjector {
 
   public async render(compiler: any): Promise<string> {
     const parsed = await this.getDocument();
-    const head = <parse5.AST.HtmlParser2.ParentNode>this.findNode(parsed, ['html', 'head']);
+    const head = <parse5.AST.HtmlParser2.ParentNode>this.findNode(parsed, [
+      'html',
+      'head',
+    ]);
     if (!head) {
       throw new MixerPluginError('Your homepage is missing a <head> section!');
     }
 
     this.prepend(head, ...(await this.injectHead(compiler)));
+
+    const body = <parse5.AST.HtmlParser2.ParentNode>this.findNode(parsed, [
+      'html',
+      'body',
+    ]);
+    if (!body) {
+      throw new MixerPluginError('Your homepage is missing a <body> section!');
+    }
+
+    // If there is a script tag already inside the body, let's not double up
+    // just in case something breaks.
+    const script = <parse5.AST.HtmlParser2.ParentNode>this.findNode(parsed, [
+      'html',
+      'body',
+      'script',
+    ]);
+    if (!script) {
+      this.append(body, ...(await this.injectBody(compiler)));
+    }
+
     return parse5.serialize(parsed);
   }
 
@@ -33,13 +56,20 @@ export abstract class HTMLInjector {
     return [];
   }
 
+  /**
+   * injectBody returns a list of HTML fragments to insert into the page <body>.
+   */
+  protected async injectBody(_compiler: any): Promise<string[]> {
+    return [];
+  }
+
   private async getDocument() {
     const og = await readFile(this.filepath);
 
     try {
       return <parse5.AST.HtmlParser2.Document>parse5.parse(og);
     } catch (e) {
-      throw new Error(`Could not parse HTML from your homeage: ${e.stack}`);
+      throw new Error(`Could not parse HTML from your homepage: ${e.stack}`);
     }
   }
 
@@ -49,11 +79,26 @@ export abstract class HTMLInjector {
     }
 
     const casted = <parse5.AST.HtmlParser2.ParentNode>parent;
-    elements.forEach(element => casted.childNodes.unshift(this.stringToNode(element)));
+    elements.forEach(element =>
+      casted.childNodes.unshift(this.stringToNode(element)),
+    );
+  }
+
+  private append(parent: parse5.AST.HtmlParser2.Node, ...elements: string[]) {
+    if (!(<any>parent).childNodes) {
+      throw new Error('Attempted to append to non-parent node');
+    }
+
+    const casted = <parse5.AST.HtmlParser2.ParentNode>parent;
+    elements.forEach(element =>
+      casted.childNodes.push(this.stringToNode(element)),
+    );
   }
 
   private stringToNode(src: string): parse5.AST.HtmlParser2.Node {
-    const fragment = <parse5.AST.HtmlParser2.DocumentFragment>parse5.parseFragment(src);
+    const fragment = <parse5.AST.HtmlParser2.DocumentFragment>parse5.parseFragment(
+      src,
+    );
     return fragment.childNodes[0];
   }
 
@@ -90,6 +135,7 @@ export class HomepageRenderer extends HTMLInjector {
     filepath: string,
     private readonly packaged: IPackageConfig,
     private readonly locales: string[],
+    private readonly unique?: string,
   ) {
     super(filepath);
   }
@@ -98,6 +144,14 @@ export class HomepageRenderer extends HTMLInjector {
     return [
       `<script>window.mixerPackageConfig=${JSON.stringify(this.packaged)};` +
         `window.mixerLocales=${JSON.stringify(this.locales)}</script>`,
+    ];
+  }
+
+  protected async injectBody(): Promise<string[]> {
+    return [
+      `<script src="./index${
+        this.unique ? `.${this.unique}.` : '.'
+      }js"></script>`,
     ];
   }
 }
