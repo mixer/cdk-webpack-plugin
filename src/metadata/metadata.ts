@@ -1,4 +1,4 @@
-import { IPackageConfig } from '@mcph/miix-std/dist/internal';
+import { IPackageConfig } from '@mixer/cdk-std/dist/internal';
 import * as Joi from 'joi';
 
 import { MetadataExtractor } from './extractor';

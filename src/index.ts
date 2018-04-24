@@ -2,7 +2,7 @@ import * as glob from 'glob';
 import * as parse5 from 'parse5';
 import * as path from 'path';
 
-import { IPackageConfig } from '@mcph/miix-std/dist/internal';
+import { IPackageConfig } from '@mixer/cdk-std/dist/internal';
 import { BundleEmitter } from './bundle-emitter';
 import { MixerPluginError, PackageIntegrityError } from './errors';
 import { exists, readFile } from './fs';
@@ -43,7 +43,7 @@ export class MixerPlugin {
   public apply(compiler: any) {
     if (!compiler.hooks) {
       throw new Error(
-        'The miix webpack plugin requires Webpack version 4. ' +
+        'The cdk webpack plugin requires Webpack version 4. ' +
           'Please run "npm install --save-dev webpack@^4.0.0" to update.',
       );
     }

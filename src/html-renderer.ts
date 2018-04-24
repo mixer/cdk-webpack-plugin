@@ -2,7 +2,7 @@ import * as glob from 'glob';
 import * as parse5 from 'parse5';
 import * as path from 'path';
 
-import { IPackageConfig } from '@mcph/miix-std/dist/internal';
+import { IPackageConfig } from '@mixer/cdk-std/dist/internal';
 import { MixerPluginError } from './errors';
 import { readFile } from './fs';
 import { createPackage } from './metadata/metadata';

@@ -11,8 +11,8 @@ import {
   IInputDescriptor,
   InputKind,
   ISceneOptions,
-} from '@mcph/miix-std/dist/internal';
-import { IPackageConfig } from '@mcph/miix-std/dist/internal';
+} from '@mixer/cdk-std/dist/internal';
+import { IPackageConfig } from '@mixer/cdk-std/dist/internal';
 import { DeclarationError, ErrorCode } from './error';
 
 type JsonType = string | number | object | boolean;

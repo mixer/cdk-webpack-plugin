@@ -11,7 +11,7 @@ describe('npm', () => {
 
   it('mustLoadPackageJson', async () => {
     expect(await mustLoadPackageJson(__dirname)).to.containSubset({
-      name: '@mcph/miix-webpack-plugin',
+      name: '@mixer/cdk-webpack-plugin',
     });
 
     try {

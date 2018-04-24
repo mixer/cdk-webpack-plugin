@@ -1,4 +1,4 @@
-import { IPackageConfig } from '@mcph/miix-std/dist/package';
+import { IPackageConfig } from '@mixer/cdk-std/dist/package';
 
 /**
  * Prefix shown before notification lines before the JSON-encoded INotification.

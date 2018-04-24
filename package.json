@@ -1,5 +1,5 @@
 {
-  "name": "@mcph/miix-webpack-plugin",
+  "name": "@mixer/cdk-webpack-plugin",
   "version": "0.1.4",
   "description": "Webpack plugin for Mixer interactive projects",
   "main": "dist/src/index.js",
@@ -14,10 +14,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/mixer/miix-webpack-plugin.git"
+    "url": "git+ssh://git@github.com/mixer/cdk-webpack-plugin.git"
   },
   "keywords": [
-    "miix",
+    "cdk",
     "mixer",
     "interactive",
     "controls",
@@ -27,11 +27,11 @@
   "author": "Connor Peet <connor@peet.io>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mixer/miix-webpack-plugin/issues"
+    "url": "https://github.com/mixer/cdk-webpack-plugin/issues"
   },
-  "homepage": "https://github.com/mixer/miix-webpack-plugin#readme",
+  "homepage": "https://github.com/mixer/cdk-webpack-plugin#readme",
   "dependencies": {
-    "@mcph/miix-std": "^0.2.12",
+    "@mixer/cdk-std": "^0.2.14",
     "glob": "^7.1.2",
     "joi": "^13.1.2",
     "json5": "^1.0.1",

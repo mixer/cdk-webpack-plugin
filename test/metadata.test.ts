@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { IInputDescriptor, InputKind } from '@mcph/miix-std/dist/internal';
+import { IInputDescriptor, InputKind } from '@mixer/cdk-std/dist/internal';
 import { readFile } from '../src/fs';
 import { EvilSniffer } from '../src/metadata/evilsniffer';
 import { MetadataExtractor } from '../src/metadata/extractor';
