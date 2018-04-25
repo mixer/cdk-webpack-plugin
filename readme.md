@@ -1,4 +1,4 @@
-# cdk-webpack-plugin
+# cdk-webpack-plugin [![Build Status](https://travis-ci.org/mixer/cdk-webpack-plugin.svg?branch=master)](https://travis-ci.org/mixer/cdk-webpack-plugin)
 
 This plugin is used for developing with custom controls. All custom control bundles are built with Webpack, and this plugin provides hooks for the CDK to collect data and upload bundles correctly.
 
