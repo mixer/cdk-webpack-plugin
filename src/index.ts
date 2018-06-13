@@ -79,17 +79,14 @@ export class MixerPlugin {
       );
     }
 
-    await Promise.all([
-      new HomepageRenderer(
-        path.resolve(compiler.context, this.options.homepage),
-        this.package,
-        Object.keys(locales),
-      )
-        .render(compiler)
-        .then(result => {
-          compilation.assets['index.html'] = contentsToAsset(result);
-        }),
-    ]);
+    const result = await new HomepageRenderer(
+      homepagePath,
+      this.package,
+      Object.keys(locales),
+    ).render(compiler);
+
+    compilation.assets['index.html'] = contentsToAsset(result);
+    addFilesToCompilation(compilation, homepagePath);
   }
 
   private async addFiles(compilation: any, files: { [assetName: string]: string }): Promise<void> {
