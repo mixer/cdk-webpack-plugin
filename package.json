@@ -1,6 +1,6 @@
 {
   "name": "@mixer/cdk-webpack-plugin",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Webpack plugin for Mixer interactive projects",
   "main": "dist/src/index.js",
   "scripts": {
